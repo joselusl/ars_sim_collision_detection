@@ -1,23 +1,19 @@
-#!/usr/bin/env python
-
 import numpy as np
 from numpy import *
 
 import os
 
 
-
-
 # ROS
+import rclpy
+from rclpy.node import Node
+from rclpy.time import Time
 
-import rospy
-
-import rospkg
+from ament_index_python.packages import get_package_share_directory
 
 import std_msgs.msg
 from std_msgs.msg import Bool
 from std_msgs.msg import Header
-
 
 import geometry_msgs.msg
 from geometry_msgs.msg import Twist
@@ -29,19 +25,13 @@ from visualization_msgs.msg import MarkerArray
 from visualization_msgs.msg import Marker
 
 
-
-
 #
-import ars_lib_helpers
+import ars_lib_helpers.ars_lib_helpers as ars_lib_helpers
 
 
 
-
-
-class ArsSimCollisionDetectionRos:
-
+class ArsSimCollisionDetectionRos(Node):
   #######
-
 
   # Robot size radius
   robot_size_radius = 0.3
@@ -56,12 +46,10 @@ class ArsSimCollisionDetectionRos:
   # Obstacles dynamic sub
   obstacles_dynamic_sub = None
 
-
   # Robot collision pub
   robot_collision_pub = None
 
   
-
   # Robot Pose
   flag_robot_pose_set = False
   robot_posi = None
@@ -74,11 +62,11 @@ class ArsSimCollisionDetectionRos:
   obstacles_dynamic_msg = None
   
 
-
   #########
 
-  def __init__(self):
-
+  def __init__(self, node_name='ars_sim_collision_detection_node'):
+    # Init ROS
+    super().__init__(node_name)
 
     # Robot size radius
     self.robot_size_radius = 0.3
@@ -94,26 +82,25 @@ class ArsSimCollisionDetectionRos:
     #
     self.obstacles_dynamic_msg = MarkerArray()
 
+    #
+    self.__init()
 
     # end
     return
 
 
-  def init(self, node_name='ars_sim_collision_detection_node'):
-    #
-
-    # Init ROS
-    rospy.init_node(node_name, anonymous=True)
-
+  def __init(self):
     
     # Package path
-    pkg_path = rospkg.RosPack().get_path('ars_sim_collision_detection')
+    try:
+      pkg_path = get_package_share_directory('ars_sim_collision_detection')
+      print(f"The path to the package is: {pkg_path}")
+    except ModuleNotFoundError:
+      print("Package not found")
     
 
     #### READING PARAMETERS ###
     
-    # TODO
-
     ###
 
 
@@ -128,18 +115,18 @@ class ArsSimCollisionDetectionRos:
     # Subscribers
 
     # 
-    self.robot_pose_sub = rospy.Subscriber('robot_pose', PoseStamped, self.robotPoseCallback)
+    self.robot_pose_sub = self.create_subscription(PoseStamped, 'robot_pose', self.robotPoseCallback, qos_profile=10)
     
     # 
-    self.obstacles_static_sub = rospy.Subscriber('obstacles_static', MarkerArray, self.obstaclesStaticCallback)
+    self.obstacles_static_sub = self.create_subscription(MarkerArray, 'obstacles_static', self.obstaclesStaticCallback, qos_profile=10)
     #
-    self.obstacles_dynamic_sub = rospy.Subscriber('obstacles_dynamic', MarkerArray, self.obstaclesDynamicCallback)
+    self.obstacles_dynamic_sub = self.create_subscription(MarkerArray, 'obstacles_dynamic', self.obstaclesDynamicCallback, qos_profile=10)
 
 
     # Publishers
 
     # 
-    self.robot_collision_pub = rospy.Publisher('robot_collision', Bool, queue_size=1)
+    self.robot_collision_pub = self.create_publisher(Bool, 'robot_collision', qos_profile=10)
 
 
     # End
@@ -148,7 +135,7 @@ class ArsSimCollisionDetectionRos:
 
   def run(self):
 
-    rospy.spin()
+    rclpy.spin(self)
 
     return
 
