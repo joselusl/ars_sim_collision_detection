@@ -7,6 +7,11 @@
   <maintainer email="joseluis.sanlop@gmail.com">Jose Luis SANCHEZ-LOPEZ</maintainer>
 
   <license>BSD</license>
+
+  <depend>rclpy</depend>
+
+  <exec_depend>python-numpy</exec_depend>
+  <exec_depend>python-nvector</exec_depend>
  
   <exec_depend>ament_index_python</exec_depend>
 
