@@ -94,9 +94,9 @@ class ArsSimCollisionDetectionRos(Node):
     # Package path
     try:
       pkg_path = get_package_share_directory('ars_sim_collision_detection')
-      print(f"The path to the package is: {pkg_path}")
+      self.get_logger().info(f"The path to the package is: {pkg_path}")
     except ModuleNotFoundError:
-      print("Package not found")
+      self.get_logger().info("Package not found")
     
 
     #### READING PARAMETERS ###
@@ -213,7 +213,7 @@ class ArsSimCollisionDetectionRos(Node):
               flag_collision_detected = True
 
           else:
-            print("Unknown obstacle type:"+obst_i_msg.type)
+            self.get_logger().info("Unknown obstacle type:"+obst_i_msg.type)
 
 
 
@@ -238,7 +238,7 @@ class ArsSimCollisionDetectionRos(Node):
               flag_collision_detected = True
 
           else:
-            print("Unknown obstacle type!!")
+            self.get_logger().info("Unknown obstacle type!!")
 
 
 
